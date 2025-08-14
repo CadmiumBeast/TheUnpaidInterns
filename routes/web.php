@@ -19,4 +19,25 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
 });
 
+
+// Admin Routes
+Route::middleware(['auth', 'user-access:admin'])->group(function () {
+    //
+});
+
+// Staff Routes
+Route::middleware(['auth', 'user-access:staff'])->group(function () {
+    //
+});
+
+// Doctor Routes
+Route::middleware(['auth', 'user-access:doctor'])->group(function () {
+    //
+});
+
+// Patient Routes
+Route::middleware(['auth', 'user-access:patient'])->group(function () {
+    //
+});
+
 require __DIR__.'/auth.php';
