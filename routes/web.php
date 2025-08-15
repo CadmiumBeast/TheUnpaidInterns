@@ -22,7 +22,7 @@ Route::middleware(['auth'])->group(function () {
 );
 
 Route::get('medicine', function () {
-    return view('components.layouts.app.medicine');
+    return view('components.layouts.app.Medicine');
 })->name('medicine');
 
 // Public appointment browsing (no patient auth needed)

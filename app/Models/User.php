@@ -61,5 +61,16 @@ class User extends Authenticatable
             ->implode('');
     }
 
-    // Keep 'type' as plain string (e.g., 'admin', 'doctor', 'staff', 'patient').
+
+    protected function type(): Attribute
+    {
+        return new Attribute(
+            get: fn ($value) =>  ["patient", "admin", "doctor", "staff"][$value],
+        );
+    }
+
+    public function patients()
+    {
+        return $this->hasMany(Patient::class);
+    }
 }

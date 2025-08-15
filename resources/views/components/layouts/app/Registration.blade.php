@@ -46,7 +46,7 @@
                 <div class="flex justify-between items-center mb-4">
                     <!-- Logo and Branding -->
                     <div class="flex items-center space-x-3">
-                        <img src="/images/logo.jpeg" alt="GovCare Logo" class="w-10 h-10">
+                        <img src="{{ asset('images/GovCare_Logo.png') }}" alt="GovCare Logo" class="w-10 h-10">
                         <div>
                             <div class="text-2xl font-bold text-teal-700">GovCare</div>
                             <div class="text-sm text-gray-600">OPD QR System</div>
@@ -94,7 +94,8 @@
             </div>
 
             <!-- Registration Form -->
-            <form class="max-w-4xl mx-auto">
+            <form class="max-w-4xl mx-auto" action="{{ route('register.post') }}" method="POST" enctype="multipart/form-data">
+                @csrf
                 <!-- Personal Information Section -->
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
                     <div class="flex items-center space-x-3 mb-6">
@@ -118,7 +119,19 @@
                             <input type="text" id="last_name" name="last_name" 
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent">
                         </div>
-                        
+
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                            <input type="password" id="password" name="password" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+                        </div>
+
+                        <div>
+                            <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                            <input type="password" id="password_confirmation" name="password_confirmation" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+                        </div>
+
                         <div>
                             <label for="nic" class="block text-sm font-medium text-gray-700 mb-2">NIC number</label>
                             <input type="text" id="nic" name="nic" 

@@ -46,7 +46,7 @@
                 <div class="flex justify-between items-center mb-4">
                     <!-- Logo and Branding -->
                     <div class="flex items-center space-x-3">
-                        <img src="/images/logo.jpeg" alt="GovCare Logo" class="w-10 h-10">
+                        <img src="{{ asset('images/GovCare_Logo.png') }}" alt="GovCare Logo" class="w-10 h-10">
                         <div>
                             <div class="text-2xl font-bold text-teal-700">GovCare</div>
                             <div class="text-sm text-gray-600">OPD QR System</div>
@@ -81,13 +81,13 @@
             <!-- Search and Filter Bar -->
             <div class="bg-gradient-to-r from-blue-500 to-teal-500 rounded-lg p-6 mb-8">
                 <div class="flex flex-col lg:flex-row gap-4 items-center">
-                    <!-- Date Filter -->
-                    <div class="flex items-center space-x-2">
-                        <label class="text-white text-sm font-medium">Date:</label>
-                        <select class="bg-white text-gray-900 px-3 py-2 rounded-md text-sm border-0 focus:ring-2 focus:ring-white focus:ring-opacity-50">
-                            <option>08/08/2025</option>
-                        </select>
-                    </div>
+                                         <!-- Date Filter -->
+                     <div class="flex items-center space-x-2">
+                         <label class="text-white text-sm font-medium">Date:</label>
+                         <input type="date" 
+                                value="2025-08-08"
+                                class="bg-white text-gray-900 px-3 py-2 rounded-md text-sm border-0 focus:ring-2 focus:ring-white focus:ring-opacity-50 cursor-pointer hover:bg-gray-50 transition-colors">
+                     </div>
                     
                     <!-- Pharmacy Filter -->
                     <div class="flex items-center space-x-2">
