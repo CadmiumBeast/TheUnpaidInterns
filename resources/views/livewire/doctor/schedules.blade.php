@@ -3,6 +3,7 @@
 use App\Models\Doctor;
 use App\Models\DoctorSchedule;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
@@ -101,7 +102,7 @@ new #[Layout('components.layouts.app')] class extends Component {
             'weekday' => ['nullable','integer','between:0,6'],
         ]);
 
-        DoctorSchedule::updateOrCreate(
+        $schedule = DoctorSchedule::updateOrCreate(
             ['id' => $this->editingId],
             [
                 'doctor_id' => $this->doctorId,
@@ -115,6 +116,21 @@ new #[Layout('components.layouts.app')] class extends Component {
                 'is_available' => $this->is_available,
             ]
         );
+
+        // Basic notification to the doctor email (if exists)
+        $doctor = Doctor::find($this->doctorId);
+        if ($doctor && $doctor->email) {
+            try {
+                Mail::raw(
+                    'Your schedule has been '.($this->editingId ? 'updated' : 'created')." for {$this->hospital_name} {$this->start_time}-{$this->end_time}",
+                    function($m) use ($doctor) {
+                        $m->to($doctor->email)->subject('Schedule update');
+                    }
+                );
+            } catch (\Throwable $e) {
+                // Silent fail; future enhancement: queue + notifications
+            }
+        }
 
         $this->resetForm();
         $this->hydrateWeek();
