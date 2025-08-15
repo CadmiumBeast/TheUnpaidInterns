@@ -16,6 +16,7 @@ new #[Layout('components.layouts.app')] class extends Component {
 
     // Form state
     public string $hospital_name = '';
+    public array $hospitals = [];
     public ?int $weekday = null;
     public string $start_time = '';
     public string $end_time = '';
@@ -32,6 +33,7 @@ new #[Layout('components.layouts.app')] class extends Component {
         $doctor = Doctor::where('user_id', $user->id)->first();
         $this->doctorId = $doctor?->id;
         $this->date = now()->toDateString();
+    $this->hospitals = config('hospitals.list', []);
         $this->hydrateWeek();
     }
 
@@ -186,7 +188,15 @@ new #[Layout('components.layouts.app')] class extends Component {
     <div class="bg-white dark:bg-zinc-900 rounded-lg p-4 shadow">
         <h2 class="text-lg font-medium mb-3">Add / Edit Slot</h2>
         <div class="grid md:grid-cols-3 gap-4">
-            <flux:input wire:model="hospital_name" label="Hospital" placeholder="Select or type..." />
+            <div>
+                <label class="text-sm block mb-1">Hospital</label>
+                <select class="w-full border rounded-md p-2 bg-white dark:bg-zinc-900" wire:model="hospital_name">
+                    <option value="">Select hospital...</option>
+                    @foreach($hospitals as $h)
+                        <option value="{{ $h }}">{{ $h }}</option>
+                    @endforeach
+                </select>
+            </div>
             <flux:select wire:model="weekday" label="Weekday">
                 <option value="">—</option>
                 <option value="1">Mon</option>

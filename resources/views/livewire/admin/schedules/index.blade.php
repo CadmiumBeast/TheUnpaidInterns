@@ -8,9 +8,11 @@ use Livewire\Volt\Component;
 new #[Layout('components.layouts.app')] class extends Component {
     public $doctorId = '';
     public $hospital = '';
+    public array $hospitals = [];
 
     public function with(): array
     {
+    $this->hospitals = config('hospitals.list', []);
         $doctors = Doctor::orderBy('full_name')->get(['id','full_name']);
         $schedules = DoctorSchedule::with('doctor')
             ->when($this->doctorId, fn($q) => $q->where('doctor_id', $this->doctorId))
@@ -36,7 +38,15 @@ new #[Layout('components.layouts.app')] class extends Component {
                 <option value="{{ $d->id }}">{{ $d->full_name }}</option>
             @endforeach
         </flux:select>
-        <flux:input wire:model="hospital" label="Hospital contains" />
+        <div>
+            <label class="text-sm block mb-1">Hospital</label>
+            <select class="w-full border rounded-md p-2 bg-white dark:bg-zinc-900" wire:model="hospital">
+                <option value="">All</option>
+                @foreach($hospitals as $h)
+                    <option value="{{ $h }}">{{ $h }}</option>
+                @endforeach
+            </select>
+        </div>
     </div>
 
     <div class="overflow-x-auto">
