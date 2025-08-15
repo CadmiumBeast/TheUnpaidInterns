@@ -18,15 +18,22 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $nic = $request->input('nic');
+        //check whether the input is a mail
+        if (filter_var($nic, FILTER_VALIDATE_EMAIL)) {
+            $user = User::where('email', $nic)->first();
+        } else {
+            $patient = Patient::where('nic', $nic)->first();
+            $user = User::where('id', $patient->user_id)->first();
+        }
+
         $password = $request->input('password');
 
-        $patient = Patient::where('nic', $nic)->first();
-
-        $user = User::where('id', $patient->user_id)->first();
 
         if ($user && Hash::check($password, $user->password)) {
             auth()->login($user);
-            return redirect()->intended('register');
+            if($user->type == 'admin'){
+                return redirect()->route('admin.dashboard')->with('success','');
+            }
         }
 
         return back()->withErrors([
