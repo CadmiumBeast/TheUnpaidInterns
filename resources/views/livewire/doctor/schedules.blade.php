@@ -50,15 +50,26 @@ new #[Layout('components.layouts.app')] class extends Component {
         $this->week = [];
         for ($i = 0; $i < 7; $i++) {
             $day = (clone $start)->addDays($i);
+            $entries = DoctorSchedule::where('doctor_id', $this->doctorId)
+                ->where(function($q) use ($day) {
+                    $q->whereDate('date', $day->toDateString())
+                      ->orWhere('weekday', $day->dayOfWeek);
+                })
+                ->orderBy('start_time')
+                ->get();
+
+            // Pre-compute booked count per entry to avoid inline PHP in Blade
+            foreach ($entries as $entry) {
+                $entry->booked = \App\Models\Appointment::where('schedule_id', $entry->id)
+                    ->whereDate('scheduled_date', $day->toDateString())
+                    ->where('start_time', $entry->start_time)
+                    ->count();
+            }
+
             $this->week[] = [
                 'label' => $day->format('D d M'),
                 'date' => $day->toDateString(),
-                'entries' => DoctorSchedule::where('doctor_id', $this->doctorId)
-                    ->where(function($q) use ($day) {
-                        $q->whereDate('date', $day->toDateString())
-                          ->orWhere('weekday', $day->dayOfWeek);
-                    })
-                    ->orderBy('start_time')->get(),
+                'entries' => $entries,
             ];
         }
     }
@@ -266,17 +277,16 @@ new #[Layout('components.layouts.app')] class extends Component {
             <div class="bg-white dark:bg-zinc-900 rounded-lg p-3 shadow">
                 <div class="font-medium mb-2">{{ $day['label'] }}</div>
                 <div class="space-y-2">
-                    @foreach($day['entries'] as $e)
+                    @foreach($day['entries'] as $slot)
                         <div class="border rounded p-2">
-                            <div class="text-sm">{{ $e->hospital_name }}</div>
-                            <div class="text-xs text-zinc-500">{{ $e->start_time }} - {{ $e->end_time }}</div>
-                            <?php $booked = \App\Models\Appointment::where('doctor_id', $e->doctor_id)->whereDate('scheduled_date', $day['date'])->where('start_time', $e->start_time)->count(); ?>
-                            <div class="text-xs">{{ $booked }}/{{ $e->capacity ?? 25 }} booked</div>
-                            <div class="text-xs">{{ $e->is_available ? 'Available' : ($e->is_exception ? 'Unavailable (Leave)' : 'Unavailable') }}</div>
+                            <div class="text-sm">{{ $slot->hospital_name }}</div>
+                            <div class="text-xs text-zinc-500">{{ $slot->start_time }} - {{ $slot->end_time }}</div>
+                            <div class="text-xs">{{ $slot->booked ?? 0 }}/{{ $slot->capacity ?? 25 }} booked</div>
+                            <div class="text-xs">{{ $slot->is_available ? 'Available' : ($slot->is_exception ? 'Unavailable (Leave)' : 'Unavailable') }}</div>
                             <div class="flex items-center gap-1 mt-2">
-                                <flux:button size="xs" wire:click="edit({{ $e->id }})">Edit</flux:button>
-                                <flux:button size="xs" wire:click="toggleAvailability({{ $e->id }})">Toggle</flux:button>
-                                <flux:button size="xs" variant="danger" wire:click="delete({{ $e->id }})">Delete</flux:button>
+                                <flux:button size="xs" wire:click="edit({{ $slot->id }})">Edit</flux:button>
+                                <flux:button size="xs" wire:click="toggleAvailability({{ $slot->id }})">Toggle</flux:button>
+                                <flux:button size="xs" variant="danger" wire:click="delete({{ $slot->id }})">Delete</flux:button>
                             </div>
                         </div>
                     @endforeach
@@ -294,9 +304,9 @@ new #[Layout('components.layouts.app')] class extends Component {
                         <flux:button size="xs" variant="ghost" wire:click="$set('date','{{ $cell['date'] }}'); setView('week')">+</flux:button>
                     </div>
                     <div class="mt-1 space-y-1">
-                        @foreach($cell['entries'] as $e)
+            @foreach($cell['entries'] as $slot)
                             <div class="text-[11px] truncate">
-                                {{ $e->start_time }} {{ $e->hospital_name }}
+                {{ $slot->start_time }} {{ $slot->hospital_name }}
                             </div>
                         @endforeach
                     </div>

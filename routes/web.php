@@ -25,6 +25,9 @@ Route::get('medicine', function () {
     return view('components.layouts.app.medicine');
 })->name('medicine');
 
+// Public appointment browsing (no patient auth needed)
+\Livewire\Volt\Volt::route('appointments', 'appointments.browse')->name('appointments.browse');
+
 // Admin Routes
 Route::middleware(['auth', 'user-access:admin'])->group(function () {
     Volt::route('admin', 'admin.dashboard')->name('admin.dashboard');
