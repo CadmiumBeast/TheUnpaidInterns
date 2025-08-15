@@ -61,10 +61,5 @@ class User extends Authenticatable
             ->implode('');
     }
 
-    protected function type(): Attribute
-    {
-        return new Attribute(
-            get: fn ($value) =>  ["patient", "admin", "doctor", "staff"][$value],
-        );
-    }
+    // Keep 'type' as plain string (e.g., 'admin', 'doctor', 'staff', 'patient').
 }

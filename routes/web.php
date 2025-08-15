@@ -26,7 +26,10 @@ Route::get('medicine', function () {
 
 // Admin Routes
 Route::middleware(['auth', 'user-access:admin'])->group(function () {
-    //
+    // Doctor Management
+    Volt::route('admin/doctors', 'admin.doctors.index')->name('admin.doctors.index');
+    Volt::route('admin/doctors/create', 'admin.doctors.create')->name('admin.doctors.create');
+    Volt::route('admin/doctors/{doctor}/edit', 'admin.doctors.edit')->name('admin.doctors.edit');
 });
 
 // Staff Routes
