@@ -271,6 +271,54 @@
             </main>
         </div>
 
+        <section class="container mx-auto my-6 lg:max-w-4xl">
+            <h2 class="text-lg font-semibold mb-3">View Appointments</h2>
+            <?php
+                $date = now()->toDateString();
+                $doctors = \App\Models\Doctor::with('user')->where('is_active', true)->orderBy('full_name')->get();
+                $cards = $doctors->map(function($d) use ($date) {
+                    $schedule = \App\Models\DoctorSchedule::where('doctor_id', $d->id)
+                        ->where(function($q) use ($date) {
+                            $q->whereDate('date', $date)
+                              ->orWhere('weekday', \Carbon\Carbon::parse($date)->dayOfWeek);
+                        })
+                        ->orderBy('start_time')
+                        ->first();
+                    return [
+                        'doctor' => $d,
+                        'hospital' => $schedule?->hospital_name,
+                        'time' => $schedule ? sprintf('%s - %s', $schedule->start_time, $schedule->end_time) : null,
+                        'available' => (bool)($schedule?->is_available),
+                    ];
+                });
+            ?>
+            <div class="grid md:grid-cols-2 gap-4">
+                @foreach($cards as $c)
+                <div class="rounded-xl border bg-white dark:bg-zinc-900 p-4 shadow">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-zinc-200 overflow-hidden">
+                            @if($c['doctor']->profile_photo_path)
+                                <img class="w-12 h-12 object-cover" src="{{ Storage::disk('public')->url($c['doctor']->profile_photo_path) }}" alt="Doctor"/>
+                            @endif
+                        </div>
+                        <div>
+                            <div class="font-semibold">{{ $c['doctor']->full_name }}</div>
+                            <div class="text-xs text-zinc-500">{{ $c['doctor']->specialty }}</div>
+                            <div class="text-xs">{{ $c['hospital'] ?? 'Hospital — N/A' }}</div>
+                            <div class="text-xs">{{ $c['time'] ?? 'Time — N/A' }}</div>
+                        </div>
+                        <div class="ms-auto text-xs {{ $c['available'] ? 'text-green-600' : 'text-zinc-500' }}">
+                            {{ $c['available'] ? 'Open' : 'Closed' }}
+                        </div>
+                    </div>
+                    <div class="mt-3 flex justify-end">
+                        <a href="{{ route('login') }}" class="px-3 py-1.5 border rounded-sm text-sm">Book</a>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </section>
+
         @if (Route::has('login'))
             <div class="h-14.5 hidden lg:block"></div>
         @endif

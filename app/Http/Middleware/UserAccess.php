@@ -14,10 +14,18 @@ class UserAccess
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next, $userType): Response
-    { if(auth()->user()->type == $userType){
+    {
+        $allowed = preg_split('/[|,]/', (string) $userType);
+        $allowed = array_map('trim', $allowed);
+
+        if (auth()->check() && in_array(auth()->user()->type, $allowed, true)) {
             return $next($request);
         }
-          
-        return response()->json(['You do not have permission to access for this page.']);
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+    abort(403, 'Forbidden');
     }
 }

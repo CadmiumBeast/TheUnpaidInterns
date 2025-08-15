@@ -13,6 +13,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/register', [RegistrationController::class, 'showForm'])->name('register');
     Route::post('/register', [RegistrationController::class, 'register'])->name('register.post');
 
+
     Volt::route('forgot-password', 'auth.forgot-password')
         ->name('password.request');
 

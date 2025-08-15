@@ -61,6 +61,7 @@ class User extends Authenticatable
             ->implode('');
     }
 
+
     protected function type(): Attribute
     {
         return new Attribute(
