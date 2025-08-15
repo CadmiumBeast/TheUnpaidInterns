@@ -67,4 +67,9 @@ class User extends Authenticatable
             get: fn ($value) =>  ["patient", "admin", "doctor", "staff"][$value],
         );
     }
+
+    public function patients()
+    {
+        return $this->hasMany(Patient::class);
+    }
 }
