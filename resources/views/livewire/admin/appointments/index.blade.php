@@ -2,6 +2,7 @@
 
 use App\Models\Appointment;
 use App\Models\Doctor;
+use App\Models\DoctorSchedule;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
@@ -12,58 +13,87 @@ new #[Layout('components.layouts.app')] class extends Component {
 
     public function with(): array
     {
-        $doctors = Doctor::orderBy('full_name')->get(['id','full_name']);
-        $appointments = Appointment::with('doctor')
-            ->when($this->doctorId, fn($q) => $q->where('doctor_id', $this->doctorId))
-            ->when($this->dateFrom, fn($q) => $q->whereDate('scheduled_date', '>=', $this->dateFrom))
-            ->when($this->dateTo, fn($q) => $q->whereDate('scheduled_date', '<=', $this->dateTo))
-            ->orderBy('scheduled_date')->orderBy('start_time')
-            ->paginate(15);
-        return compact('appointments','doctors');
+        $date = $this->dateFrom ?: now()->toDateString();
+
+        $doctors = Doctor::query()
+            ->when($this->doctorId, fn($q) => $q->where('id', $this->doctorId))
+            ->where('is_active', true)
+            ->orderBy('full_name')
+            ->get(['id','full_name','specialty','profile_photo_path']);
+
+        $cards = collect();
+        foreach ($doctors as $doctor) {
+            $schedules = DoctorSchedule::where('doctor_id', $doctor->id)
+                ->where(function($q) use ($date) {
+                    $q->whereDate('date', $date)
+                      ->orWhere('weekday', \Carbon\Carbon::parse($date)->dayOfWeek);
+                })
+                ->where('is_available', true)
+                ->orderBy('start_time')
+                ->get();
+
+            foreach ($schedules as $schedule) {
+                $maxBookings = 25; // TODO: make configurable per schedule
+                $booked = Appointment::where('doctor_id', $doctor->id)
+                    ->whereDate('scheduled_date', $date)
+                    ->where('start_time', $schedule->start_time)
+                    ->count();
+
+                $cards->push([
+                    'doctor' => $doctor,
+                    'schedule' => $schedule,
+                    'booked' => $booked,
+                    'max' => $maxBookings,
+                    'date' => $date,
+                ]);
+            }
+        }
+
+        return compact('doctors','cards','date');
     }
 };
 ?>
 
 <div class="space-y-6">
-    <h1 class="text-xl font-semibold">Appointments</h1>
+    <h1 class="text-2xl font-semibold mb-4">Doctor Appointment Slots</h1>
 
-    <div class="grid md:grid-cols-4 gap-4">
+    <div class="flex flex-wrap gap-4 mb-6">
+        <flux:input type="date" wire:model="dateFrom" label="Date" />
         <flux:select wire:model="doctorId" label="Doctor">
             <option value="">All</option>
             @foreach($doctors as $d)
                 <option value="{{ $d->id }}">{{ $d->full_name }}</option>
             @endforeach
         </flux:select>
-        <flux:input type="date" wire:model="dateFrom" label="From" />
-        <flux:input type="date" wire:model="dateTo" label="To" />
     </div>
 
-    <div class="overflow-x-auto bg-white dark:bg-zinc-900 rounded-lg shadow">
-        <table class="min-w-full text-sm">
-            <thead>
-                <tr class="text-left">
-                    <th class="p-2">Date</th>
-                    <th class="p-2">Time</th>
-                    <th class="p-2">Doctor</th>
-                    <th class="p-2">Patient</th>
-                    <th class="p-2">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($appointments as $a)
-                <tr class="border-t">
-                    <td class="p-2">{{ $a->scheduled_date }}</td>
-                    <td class="p-2">{{ \Carbon\Carbon::parse($a->start_time)->format('H:i') }}</td>
-                    <td class="p-2">{{ $a->doctor?->full_name }}</td>
-                    <td class="p-2">#{{ $a->patient_id }}</td>
-                    <td class="p-2">{{ $a->status }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-
-    <div>
-        {{ $appointments->links() }}
+    <div class="grid md:grid-cols-3 gap-6">
+        @foreach($cards as $c)
+        <div class="rounded-xl border bg-white dark:bg-zinc-900 p-4 shadow">
+            <div class="flex items-center gap-3">
+                <div class="w-14 h-14 rounded-full bg-zinc-200 overflow-hidden">
+                    @if($c['doctor']->profile_photo_path)
+                        <img class="w-14 h-14 object-cover" src="{{ Storage::disk('public')->url($c['doctor']->profile_photo_path) }}" alt="Doctor"/>
+                    @endif
+                </div>
+                <div>
+                    <div class="font-semibold">{{ $c['doctor']->full_name }}</div>
+                    <div class="text-sm text-zinc-500">{{ $c['doctor']->specialty }}</div>
+                </div>
+            </div>
+            <div class="mt-3 text-sm text-zinc-600">
+                <div>{{ $c['schedule']->hospital_name ?? 'Hospital — N/A' }}</div>
+                <div>{{ $c['date'] }}</div>
+                <div>{{ $c['schedule']->start_time }} - {{ $c['schedule']->end_time }}</div>
+                <div>{{ $c['booked'] }}/{{ $c['max'] }} Patients Booked</div>
+            </div>
+            <div class="mt-4 flex items-center justify-between">
+                <div class="text-xs {{ $c['booked'] < $c['max'] ? 'text-green-600' : 'text-red-600' }}">
+                    {{ $c['booked'] < $c['max'] ? 'Available' : 'Full' }}
+                </div>
+                <flux:button variant="primary" :disabled="$c['booked'] >= $c['max']">Reserve Appointment</flux:button>
+            </div>
+        </div>
+        @endforeach
     </div>
 </div>

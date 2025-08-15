@@ -83,7 +83,7 @@ new #[Layout('components.layouts.app')] class extends Component {
 						{{ $c['available'] ? 'Open' : 'Closed' }}
 					</div>
 					<flux:link :href="route('admin.appointments.index')" wire:navigate>
-						<flux:button variant="destructive">View Appointments</flux:button>
+						<flux:button variant="primary">View Appointments</flux:button>
 					</flux:link>
 				</div>
 			</div>
