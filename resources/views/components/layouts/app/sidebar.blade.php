@@ -16,7 +16,7 @@
                     <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
                     @if(auth()->check() && auth()->user()->type === 'admin')
                         <flux:navlist.item icon="layout-grid" :href="route('admin.dashboard')" :current="request()->routeIs('admin.*')" wire:navigate>Admin</flux:navlist.item>
-                        <flux:navlist.item icon="user-round-cog" :href="route('admin.doctors.index')" :current="request()->routeIs('admin.doctors.*')" wire:navigate>Manage Doctors</flux:navlist.item>
+                            <flux:navlist.item icon="user-cog" :href="route('admin.doctors.index')" :current="request()->routeIs('admin.doctors.*')" wire:navigate>Manage Doctors</flux:navlist.item>
                         <flux:navlist.item icon="calendar" :href="route('admin.schedules.index')" :current="request()->routeIs('admin.schedules.*')" wire:navigate>Schedules</flux:navlist.item>
                         <flux:navlist.item icon="calendar-range" :href="route('admin.appointments.index')" :current="request()->routeIs('admin.appointments.*')" wire:navigate>Appointments</flux:navlist.item>
                     @endif
