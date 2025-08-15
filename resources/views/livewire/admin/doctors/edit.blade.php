@@ -18,6 +18,7 @@ new #[Layout('components.layouts.app')] class extends Component {
     public string $schedule_notes = '';
     public bool $is_active = true;
     public $profile_photo;
+    public string $new_password = '';
 
     public function mount(Doctor $doctor): void
     {
@@ -38,6 +39,7 @@ new #[Layout('components.layouts.app')] class extends Component {
             'schedule_notes' => ['nullable', 'string', 'max:500'],
             'is_active' => ['boolean'],
             'profile_photo' => ['nullable', 'image', 'max:2048'],
+            'new_password' => ['nullable', 'string', 'min:8'],
         ]);
 
         if ($this->profile_photo) {
@@ -45,6 +47,10 @@ new #[Layout('components.layouts.app')] class extends Component {
         }
 
         $this->doctor->update($validated);
+
+        if (!empty($this->new_password) && $this->doctor->user) {
+            $this->doctor->user->update(['password' => $this->new_password]);
+        }
 
         $this->redirect(route('admin.doctors.index'), navigate: true);
     }

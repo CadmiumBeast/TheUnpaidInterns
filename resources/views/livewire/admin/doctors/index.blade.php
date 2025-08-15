@@ -20,10 +20,11 @@ new #[Layout('components.layouts.app')] class extends Component {
         ];
     }
 
-    public function toggleActive(Doctor $doctor): void
+    public function toggleActive(int $doctor): void
     {
-        $doctor->is_active = ! $doctor->is_active;
-        $doctor->save();
+        $doc = Doctor::findOrFail($doctor);
+        $doc->is_active = ! $doc->is_active;
+        $doc->save();
     }
 };
 ?>
