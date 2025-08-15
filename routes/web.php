@@ -26,17 +26,16 @@ Route::get('medicine', function () {
 
 // Admin Routes
 Route::middleware(['auth', 'user-access:admin'])->group(function () {
-    Route::view('admin', 'components.layouts.app.sidebar', ['title' => 'Admin Dashboard'])
-        ->name('admin.dashboard');
+    Volt::route('admin', 'admin.dashboard')->name('admin.dashboard');
 
     // Doctor Management
     Volt::route('admin/doctors', 'admin.doctors.index')->name('admin.doctors.index');
     Volt::route('admin/doctors/create', 'admin.doctors.create')->name('admin.doctors.create');
     Volt::route('admin/doctors/{doctor}/edit', 'admin.doctors.edit')->name('admin.doctors.edit');
 
-    // Placeholders for schedules and appointments under admin area
-    Route::view('admin/schedules', 'components.layouts.app.app', ['title' => 'Schedules'])->name('admin.schedules');
-    Route::view('admin/appointments', 'components.layouts.app.app', ['title' => 'Appointments'])->name('admin.appointments');
+    // Admin schedules and appointments
+    Volt::route('admin/schedules', 'admin.schedules.index')->name('admin.schedules.index');
+    Volt::route('admin/appointments', 'admin.appointments.index')->name('admin.appointments.index');
 });
 
 // Staff Routes
@@ -47,6 +46,7 @@ Route::middleware(['auth', 'user-access:staff'])->group(function () {
 // Doctor Routes
 Route::middleware(['auth', 'user-access:doctor'])->group(function () {
     Volt::route('doctor', 'doctor.dashboard')->name('doctor.dashboard');
+    Volt::route('doctor/schedules', 'doctor.schedules')->name('doctor.schedules');
 });
 
 // Patient Routes
