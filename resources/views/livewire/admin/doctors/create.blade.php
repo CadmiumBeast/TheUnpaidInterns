@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Doctor;
+use App\Models\DoctorSchedule;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -25,9 +26,16 @@ new #[Layout('components.layouts.app')] class extends Component {
     public string $username = '';
     public string $password = '';
 
+    // Optional: create initial schedules
+    public array $hospitals = [];
+    public array $initialSchedules = [
+        // ['hospital_name' => '', 'weekday' => null, 'start_time' => '', 'end_time' => '']
+    ];
+
     public function mount(): void
     {
         $this->is_active = true;
+    $this->hospitals = config('hospitals.list', []);
     }
 
     public function save(): void
@@ -74,6 +82,22 @@ new #[Layout('components.layouts.app')] class extends Component {
             'profile_photo_path' => $photoPath,
         ]);
 
+        // Create initial schedules if provided
+    foreach ($this->initialSchedules as $slot) {
+            if (!empty($slot['hospital_name']) && !empty($slot['start_time']) && !empty($slot['end_time'])) {
+                DoctorSchedule::create([
+                    'doctor_id' => $doctor->id,
+                    'hospital_name' => $slot['hospital_name'],
+                    'weekday' => $slot['weekday'] !== '' ? (int)$slot['weekday'] : null,
+                    'start_time' => $slot['start_time'],
+                    'end_time' => $slot['end_time'],
+            'capacity' => isset($slot['capacity']) && (int)$slot['capacity'] > 0 ? (int)$slot['capacity'] : 25,
+                    'is_available' => true,
+                    'is_exception' => false,
+                ]);
+            }
+        }
+
         $this->redirect(route('admin.doctors.index'), navigate: true);
     }
 };
@@ -107,6 +131,46 @@ new #[Layout('components.layouts.app')] class extends Component {
                 <flux:input wire:model="username" label="Username / Display name" />
                 <flux:input wire:model="password" label="Temporary password" type="password" />
             </div>
+        </div>
+
+        <div class="border-t pt-4 space-y-3">
+            <h2 class="text-lg font-medium">Initial Weekly Schedule (optional)</h2>
+            <p class="text-sm text-zinc-500">Add one or more recurring slots to get this doctor visible in appointments.</p>
+            <div class="space-y-3">
+                @foreach($initialSchedules as $idx => $s)
+                <div class="grid md:grid-cols-5 gap-2 items-end">
+                    <div>
+                        <label class="text-sm block mb-1">Hospital</label>
+                        <select class="w-full border rounded-md p-2 bg-white dark:bg-zinc-900" wire:model="initialSchedules.{{ $idx }}.hospital_name">
+                            <option value="">Select...</option>
+                            @foreach($hospitals as $h)
+                                <option value="{{ $h }}">{{ $h }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-sm block mb-1">Weekday</label>
+                        <select class="w-full border rounded-md p-2 bg-white dark:bg-zinc-900" wire:model="initialSchedules.{{ $idx }}.weekday">
+                            <option value="">—</option>
+                            <option value="1">Mon</option>
+                            <option value="2">Tue</option>
+                            <option value="3">Wed</option>
+                            <option value="4">Thu</option>
+                            <option value="5">Fri</option>
+                            <option value="6">Sat</option>
+                            <option value="0">Sun</option>
+                        </select>
+                    </div>
+                    <flux:input type="time" wire:model="initialSchedules.{{ $idx }}.start_time" label="Start" />
+                    <flux:input type="time" wire:model="initialSchedules.{{ $idx }}.end_time" label="End" />
+            <flux:input type="number" min="1" max="200" wire:model="initialSchedules.{{ $idx }}.capacity" label="Capacity" />
+            <div class="md:col-span-5">
+                        <flux:button type="button" wire:click="$set('initialSchedules', array_values(array_filter(initialSchedules, fn($v,$k)=>$k!={{ $idx }}, ARRAY_FILTER_USE_BOTH)))">Remove</flux:button>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        <flux:button type="button" wire:click="$push('initialSchedules', ['hospital_name'=>'','weekday'=>'','start_time'=>'','end_time'=>'','capacity'=>25])">+ Add Slot</flux:button>
         </div>
 
         <flux:button type="submit" variant="primary">Save</flux:button>

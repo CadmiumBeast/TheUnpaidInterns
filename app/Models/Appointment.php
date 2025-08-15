@@ -13,6 +13,7 @@ class Appointment extends Model
     protected $fillable = [
         'patient_id',
         'doctor_id',
+    'schedule_id',
         'scheduled_date',
         'start_time',
         'duration_minutes',
@@ -25,7 +26,8 @@ class Appointment extends Model
 
     protected $casts = [
         'scheduled_date' => 'date',
-        'start_time' => 'datetime:H:i',
+    // store start_time as time string HH:MM
+    'start_time' => 'string',
         'is_recurring' => 'boolean',
     ];
 
@@ -37,5 +39,10 @@ class Appointment extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function schedule(): BelongsTo
+    {
+        return $this->belongsTo(DoctorSchedule::class, 'schedule_id');
     }
 }

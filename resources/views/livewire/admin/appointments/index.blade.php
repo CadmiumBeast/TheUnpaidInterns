@@ -33,7 +33,7 @@ new #[Layout('components.layouts.app')] class extends Component {
                 ->get();
 
             foreach ($schedules as $schedule) {
-                $maxBookings = 25; // TODO: make configurable per schedule
+                $maxBookings = $schedule->capacity ?? 25;
                 $booked = Appointment::where('doctor_id', $doctor->id)
                     ->whereDate('scheduled_date', $date)
                     ->where('start_time', $schedule->start_time)
@@ -85,13 +85,20 @@ new #[Layout('components.layouts.app')] class extends Component {
                 <div>{{ $c['schedule']->hospital_name ?? 'Hospital — N/A' }}</div>
                 <div>{{ $c['date'] }}</div>
                 <div>{{ $c['schedule']->start_time }} - {{ $c['schedule']->end_time }}</div>
-                <div>{{ $c['booked'] }}/{{ $c['max'] }} Patients Booked</div>
+                <div>{{ $c['booked'] }}/{{ $c['max'] }} Patients Booked ({{ max($c['max'] - $c['booked'], 0) }} left)</div>
             </div>
             <div class="mt-4 flex items-center justify-between">
                 <div class="text-xs {{ $c['booked'] < $c['max'] ? 'text-green-600' : 'text-red-600' }}">
                     {{ $c['booked'] < $c['max'] ? 'Available' : 'Full' }}
                 </div>
-                <flux:button variant="primary" :disabled="$c['booked'] >= $c['max']">Reserve Appointment</flux:button>
+                <form method="POST" action="{{ route('admin.appointments.reserve') }}">
+                    @csrf
+                    <input type="hidden" name="doctor_id" value="{{ $c['doctor']->id }}" />
+                    <input type="hidden" name="schedule_id" value="{{ $c['schedule']->id }}" />
+                    <input type="hidden" name="date" value="{{ $c['date'] }}" />
+                    <input type="hidden" name="start_time" value="{{ $c['schedule']->start_time }}" />
+                    <flux:button type="submit" variant="primary" :disabled="$c['booked'] >= $c['max']">Reserve</flux:button>
+                </form>
             </div>
         </div>
         @endforeach

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
+use App\Http\Controllers\Admin\AppointmentReservationController;
 
 Route::get('/', function () {
     return view('components.layouts.app.welcome');
@@ -36,6 +37,7 @@ Route::middleware(['auth', 'user-access:admin'])->group(function () {
     // Admin schedules and appointments
     Volt::route('admin/schedules', 'admin.schedules.index')->name('admin.schedules.index');
     Volt::route('admin/appointments', 'admin.appointments.index')->name('admin.appointments.index');
+    Route::post('admin/appointments/reserve', [AppointmentReservationController::class, 'store'])->name('admin.appointments.reserve');
 });
 
 // Staff Routes

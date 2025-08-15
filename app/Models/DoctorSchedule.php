@@ -17,6 +17,7 @@ class DoctorSchedule extends Model
         'weekday',
         'start_time',
         'end_time',
+    'capacity',
         'breaks',
         'recurrence_rule',
         'is_exception',
@@ -33,5 +34,10 @@ class DoctorSchedule extends Model
     public function doctor(): BelongsTo
     {
         return $this->belongsTo(Doctor::class);
+    }
+
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class, 'schedule_id');
     }
 }
