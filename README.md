@@ -14,13 +14,15 @@ Stack
 2. Install Composer
 3. Clone the application
     git clone https://github.com/CadmiumBeast/TheUnpaidInterns.git
-4. copy .env.exmample and rename to .env
+4. copy .env.exmample and rename to .env \n
 *The Below Code in the Terminal*
 5. composer install
 6. npm install
 7. php artisan migrate
 8. php artisan db:seed
+9. php artisan key:generate
+10. php artisan storage:link
 
-9. npm run dev
+11. npm run dev
 *In a new Terminal*
-10. php artisan serve
+12. php artisan serve
