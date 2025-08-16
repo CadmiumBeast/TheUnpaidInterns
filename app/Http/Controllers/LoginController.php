@@ -33,6 +33,13 @@ class LoginController extends Controller
             auth()->login($user);
             if($user->type == 'admin'){
                 return redirect()->route('admin.dashboard')->with('success','');
+            }else if($user->type == 'doctor'){
+                return redirect()->route('doctor.dashboard')->with('success','');
+            }
+            else if($user->type == 'patient'){
+                return redirect()->route('medicine')->with('success','');
+            } else if($user->type == 'staff'){
+                return redirect()->route('staff.dashboard')->with('success','');
             }
         }
 

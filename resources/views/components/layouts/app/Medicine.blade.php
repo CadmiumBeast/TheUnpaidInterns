@@ -39,42 +39,68 @@
         </script>
     </head>
     <body class="bg-gray-50 text-gray-900 font-sans">
-        <!-- Header Section -->
-        <header class="bg-white shadow-sm border-b border-gray-200">
-            <div class="container mx-auto px-6 py-4">
-                <!-- Top Header -->
-                <div class="flex justify-between items-center mb-4">
-                    <!-- Logo and Branding -->
-                    <div class="flex items-center space-x-3">
-                        <img src="{{ asset('images/GovCare_Logo.png') }}" alt="GovCare Logo" class="w-10 h-10">
-                        <div>
-                            <div class="text-2xl font-bold text-teal-700">GovCare</div>
-                            <div class="text-sm text-gray-600">OPD QR System</div>
-                            <div class="text-xs text-gray-500">Ministry of Health - Sri Lanka</div>
-                        </div>
-                    </div>
-                    
-                    <!-- System Status -->
-                    <div class="flex items-center space-x-2">
-                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-                        <span class="text-sm text-gray-600">System Online</span>
-                    </div>
+    <!-- Header Section -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center mb-4">
+                <!-- Logo and Branding -->
+                <div class="flex items-center space-x-3">
+                    <img src="{{ asset('images/GovCare_Logo_Small.png') }}" alt="GovCare Logo" width="200px" height="auto">
                 </div>
-                
-                <!-- Navigation Tabs -->
-                <nav class="flex space-x-8">
-                    <a href="{{ route('dashboard') }}" class="text-gray-500 hover:text-gray-700 py-2 px-1 border-b-2 border-transparent hover:border-gray-300 transition-colors">
-                        Overview
-                    </a>
-                    <a href="{{ route('register') }}" class="text-gray-500 hover:text-gray-700 py-2 px-1 border-b-2 border-transparent hover:border-gray-300 transition-colors">
-                        Register
-                    </a>
-                    <a href="{{ route('medicine') }}" class="text-teal-600 py-2 px-1 border-b-2 border-teal-600 font-medium">
-                        Medicine
-                    </a>
-                </nav>
+                <!-- Logout Button -->
+                <form method="POST" action="{{ route('logout') }}" class="flex items-center">
+                    @csrf
+                    <button type="submit" class="flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg shadow transition-colors">
+                        <svg class="w-4 h-4 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
+                        </svg>
+                        Logout
+                    </button>
+                </form>
             </div>
-        </header>
+            <!-- Navigation Tabs -->
+            <nav class="flex justify-center mt-2">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 flex space-x-2 px-2 py-1">
+                    <a href="{{ route('admin.dashboard') }}" class="flex items-center px-5 py-2 rounded-lg text-gray-600 hover:text-teal-700 hover:bg-teal-50 font-medium transition-colors {{ request()->routeIs('dashboard') ? 'bg-teal-100 text-teal-700 font-semibold shadow' : '' }}">
+                        <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M13 5v6h6m-6 0H7m6 0v6m0 0H7m6 0h6"></path></svg>
+                        Dashboard
+                    </a>
+                    @if(auth()->check() && auth()->user()->type === 'admin')
+                        <a href="{{ route('admin.appointments.index') }}" class="flex items-center px-5 py-2 rounded-lg text-gray-600 hover:text-teal-700 hover:bg-teal-50 font-medium transition-colors {{ request()->routeIs('admin.appointments.*') ? 'bg-teal-100 text-teal-700 font-semibold shadow' : '' }}">
+                            <svg class="w-4 h-4 mr-2 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 018 0v2M9 7a4 4 0 100-8 4 4 0 000 8zm6 8v-2a6 6 0 00-12 0v2"></path></svg>
+                            Appointments
+                        </a>
+                        <a href="{{ route('admin.doctors.index') }}" class="flex items-center px-5 py-2 rounded-lg text-gray-600 hover:text-teal-700 hover:bg-teal-50 font-medium transition-colors {{ request()->routeIs('admin.doctors.*') ? 'bg-teal-100 text-teal-700 font-semibold shadow' : '' }}">
+                            <svg class="w-4 h-4 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Doctors
+                        </a>
+                        <a href="{{ route('admin.medicine') }}" class="flex items-center px-5 py-2 rounded-lg text-gray-600 hover:text-teal-700 hover:bg-teal-50 font-medium transition-colors {{ request()->routeIs('medicine') ? 'bg-teal-100 text-teal-700 font-semibold shadow' : '' }}">
+                            <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 018 0v2M9 7a4 4 0 100-8 4 4 0 000 8zm6 8v-2a6 6 0 00-12 0v2"></path></svg>
+                            Medicine
+                        </a>
+                    @elseif(auth()->check() && auth()->user()->type === 'doctor')
+                        <a href="{{ route('doctor.dashboard') }}" class="flex items-center px-5 py-2 rounded-lg text-gray-600 hover:text-teal-700 hover:bg-teal-50 font-medium transition-colors {{ request()->routeIs('doctor.dashboard') ? 'bg-teal-100 text-teal-700 font-semibold shadow' : '' }}">
+                            <svg class="w-4 h-4 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Doctor Dashboard
+                        </a>
+                        <a href="{{ route('doctor.schedules.index') }}" class="flex items-center px-5 py-2 rounded-lg text-gray-600 hover:text-teal-700 hover:bg-teal-50 font-medium transition-colors {{ request()->routeIs('doctor.schedules.*') ? 'bg-teal-100 text-teal-700 font-semibold shadow' : '' }}">
+                            <svg class="w-4 h-4 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Schedules
+                        </a>
+                    @elseif(auth()->check() && auth()->user()->type === 'patient')
+                        <a href="{{ route('patient.appointments.index') }}" class="flex items-center px-5 py-2 rounded-lg text-gray-600 hover:text-teal-700 hover:bg-teal-50 font-medium transition-colors {{ request()->routeIs('patient.appointments.*') ? 'bg-teal-100 text-teal-700 font-semibold shadow' : '' }}">
+                            <svg class="w-4 h-4 mr-2 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 018 0v2M9 7a4 4 0 100-8 4 4 0 000 8zm6 8v-2a6 6 0 00-12 0v2"></path></svg>
+                            Appointments
+                        </a>
+                        <a href="{{ route('medicine') }}" class="flex items-center px-5 py-2 rounded-lg text-gray-600 hover:text-teal-700 hover:bg-teal-50 font-medium transition-colors {{ request()->routeIs('medicine') ? 'bg-teal-100 text-teal-700 font-semibold shadow' : '' }}">
+                        <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 018 0v2M9 7a4 4 0 100-8 4 4 0 000 8zm6 8v-2a6 6 0 00-12 0v2"></path></svg>
+                        Medicine
+                        </a>
+                    @endif
+                </div>
+            </nav>
+        </div>
+    </header>
 
         <!-- Main Content -->
         <main class="container mx-auto px-6 py-8">
@@ -163,7 +189,7 @@
                                         </div>
                                         <div class="flex items-center space-x-3">
                                             <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">{{ $medicine->status ?? 'Available' }}</span>
-                                            <button class="text-gray-400 hover:text-gray-600">
+                                            {{-- <button class="text-gray-400 hover:text-gray-600">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -171,7 +197,7 @@
                                             </button>
                                             <button class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors">
                                                 Buy Now
-                                            </button>
+                                            </button> --}}
                                         </div>
                                     </div>
                                 </div>

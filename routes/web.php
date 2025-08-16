@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\MedicineController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
@@ -35,7 +36,7 @@ Route::middleware(['auth', 'user-access:admin'])->group(function () {
     Volt::route('admin/doctors', 'admin.doctors.index')->name('admin.doctors.index');
     Volt::route('admin/doctors/create', 'admin.doctors.create')->name('admin.doctors.create');
     Volt::route('admin/doctors/{doctor}/edit', 'admin.doctors.edit')->name('admin.doctors.edit');
-
+    Route::get('admin/medicine', [MedicineController::class, 'index'])->name('admin.medicine');
     // Admin schedules and appointments
     Volt::route('admin/schedules', 'admin.schedules.index')->name('admin.schedules.index');
     Volt::route('admin/appointments', 'admin.appointments.index')->name('admin.appointments.index');
@@ -56,6 +57,9 @@ Route::middleware(['auth', 'user-access:doctor'])->group(function () {
 // Patient Routes
 Route::middleware(['auth', 'user-access:patient'])->group(function () {
     Route::get('medicine', [MedicineController::class, 'index'])->name('medicine');
+    Volt::route('patient', 'patient.dashboard')->name('patient.dashboard');
+    Route::get('patient/appointments', [AppointmentController::class, 'index'])->name('patient.appointments.index');
+        Route::post('patient/appointments/reserve', [\App\Http\Controllers\AppointmentController::class, 'reserve'])->name('patient.appointments.reserve');
 });
 
 require __DIR__.'/auth.php';
