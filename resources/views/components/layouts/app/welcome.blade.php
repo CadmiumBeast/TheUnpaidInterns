@@ -46,7 +46,7 @@
                 <nav class="flex justify-between items-center mb-8">
                     <!-- Logo -->
                     <div class="flex items-center space-x-3">
-                        <img src="/images/logo.jpeg" alt="GovCare Logo" class="w-10 h-10">
+                        <img src="{{ asset('images/GovCare_Logo.png') }}" alt="GovCare Logo" class="w-10 h-10">
                         <div>
                             <div class="text-xl font-bold text-gray-900">GovCare</div>
                             <div class="text-sm text-gray-600">OPD-QR System</div>
@@ -237,70 +237,15 @@
         </div>
         </section>
 
-<<<<<<< HEAD
         <!-- Footer -->
         <footer class="bg-gray-900 text-white py-12">
             <div class="container mx-auto px-4 text-center">
                 <div class="flex items-center justify-center space-x-3 mb-4">
-                    <img src="/images/logo.jpeg" alt="GovCare Logo" class="w-10 h-10">
-                    <div class="text-xl font-bold">GovCare</div>
+                    <img src="{{ asset('images/GovCare_Logo.png') }}" alt="GovCare Logo" class="w-1/4 h-1/4">
                 </div>
                 <p class="text-gray-400 mb-2">Developed for the Ministry of Health, Sri Lanka</p>
                 <p class="text-gray-500">© 2025 Government of Sri Lanka. All rights reserved.</p>
             </div>
         </footer>
-=======
-        <section class="container mx-auto my-6 lg:max-w-4xl">
-            <h2 class="text-lg font-semibold mb-3">View Appointments</h2>
-            <?php
-                $date = now()->toDateString();
-                $doctors = \App\Models\Doctor::with('user')->where('is_active', true)->orderBy('full_name')->get();
-                $cards = $doctors->map(function($d) use ($date) {
-                    $schedule = \App\Models\DoctorSchedule::where('doctor_id', $d->id)
-                        ->where(function($q) use ($date) {
-                            $q->whereDate('date', $date)
-                              ->orWhere('weekday', \Carbon\Carbon::parse($date)->dayOfWeek);
-                        })
-                        ->orderBy('start_time')
-                        ->first();
-                    return [
-                        'doctor' => $d,
-                        'hospital' => $schedule?->hospital_name,
-                        'time' => $schedule ? sprintf('%s - %s', $schedule->start_time, $schedule->end_time) : null,
-                        'available' => (bool)($schedule?->is_available),
-                    ];
-                });
-            ?>
-            <div class="grid md:grid-cols-2 gap-4">
-                @foreach($cards as $c)
-                <div class="rounded-xl border bg-white dark:bg-zinc-900 p-4 shadow">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-full bg-zinc-200 overflow-hidden">
-                            @if($c['doctor']->profile_photo_path)
-                                <img class="w-12 h-12 object-cover" src="{{ Storage::disk('public')->url($c['doctor']->profile_photo_path) }}" alt="Doctor"/>
-                            @endif
-                        </div>
-                        <div>
-                            <div class="font-semibold">{{ $c['doctor']->full_name }}</div>
-                            <div class="text-xs text-zinc-500">{{ $c['doctor']->specialty }}</div>
-                            <div class="text-xs">{{ $c['hospital'] ?? 'Hospital — N/A' }}</div>
-                            <div class="text-xs">{{ $c['time'] ?? 'Time — N/A' }}</div>
-                        </div>
-                        <div class="ms-auto text-xs {{ $c['available'] ? 'text-green-600' : 'text-zinc-500' }}">
-                            {{ $c['available'] ? 'Open' : 'Closed' }}
-                        </div>
-                    </div>
-                    <div class="mt-3 flex justify-end">
-                        <a href="{{ route('login') }}" class="px-3 py-1.5 border rounded-sm text-sm">Book</a>
-                    </div>
-                </div>
-                @endforeach
-            </div>
-        </section>
-
-        @if (Route::has('login'))
-            <div class="h-14.5 hidden lg:block"></div>
-        @endif
->>>>>>> 621b53d6aa9e6236f83b9054b591e051bb64dfa4
     </body>
 </html>

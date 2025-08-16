@@ -61,11 +61,17 @@ class User extends Authenticatable
             ->implode('');
     }
 
-    protected function type(): Attribute
+
+    // protected function type(): Attribute
+    // {
+    //     return new Attribute(
+    //         get: fn ($value) =>  ["patient", "admin", "doctor", "staff"][$value],
+    //     );
+    // }
+
+    public function patients()
     {
-        return new Attribute(
-            get: fn ($value) =>  ["patient", "admin", "doctor", "staff"][$value],
-        );
+        return $this->hasMany(Patient::class);
     }
 
     public function complaints()
