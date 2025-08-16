@@ -36,6 +36,11 @@ class Appointment extends Model
         return $this->belongsTo(Doctor::class);
     }
 
+    public function patient(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'patient_id');
+    }
+
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
