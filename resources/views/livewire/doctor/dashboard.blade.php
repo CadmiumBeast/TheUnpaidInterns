@@ -37,13 +37,13 @@ new #[Layout('components.layouts.app')] class extends Component {
     {
     $id = $this->doctorId ?? 0;
 
-        $todayAppointments = Appointment::with('doctor')
+    $todayAppointments = Appointment::with(['doctor','patient'])
             ->whereDate('scheduled_date', $this->today)
             ->where('doctor_id', $id)
             ->orderBy('start_time')
             ->get();
 
-        $upcoming = Appointment::with('doctor')
+    $upcoming = Appointment::with(['doctor','patient'])
             ->whereBetween('scheduled_date', [now()->toDateString(), now()->addDays(7)->toDateString()])
             ->where('doctor_id', $id)
             ->orderBy('scheduled_date')
@@ -161,10 +161,10 @@ new #[Layout('components.layouts.app')] class extends Component {
                     <li class="flex items-center justify-between border-b py-2">
                         <div>
                             <div class="font-medium">{{ \Carbon\Carbon::parse($a->start_time)->format('H:i') }}</div>
-                            <div class="text-sm text-zinc-500">Patient #{{ $a->patient_id }}</div>
+                            <div class="text-sm text-zinc-500">{{ $a->patient?->name ?? ('Patient #'.$a->patient_id) }}</div>
                         </div>
                         <div class="flex items-center gap-2">
-                            <flux:link href="#" class="text-teal-600">View Record</flux:link>
+                            <flux:link :href="route('doctor.appointment', ['appointment' => $a->id])" wire:navigate class="text-teal-600">View Record</flux:link>
                         </div>
                     </li>
                 @empty
@@ -180,7 +180,7 @@ new #[Layout('components.layouts.app')] class extends Component {
                     <li class="flex items-center justify-between border-b py-2">
                         <div>
                             <div class="font-medium">{{ \Carbon\Carbon::parse($a->scheduled_date)->format('Y-m-d') }} {{ \Carbon\Carbon::parse($a->start_time)->format('H:i') }}</div>
-                            <div class="text-sm text-zinc-500">Patient #{{ $a->patient_id }}</div>
+                            <div class="text-sm text-zinc-500">{{ $a->patient?->name ?? ('Patient #'.$a->patient_id) }}</div>
                         </div>
                     </li>
                 @empty

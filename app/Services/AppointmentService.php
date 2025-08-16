@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Appointment;
 use App\Models\DoctorSchedule;
+use App\Notifications\AppointmentBookedNotification;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -79,7 +81,7 @@ class AppointmentService
                 throw ValidationException::withMessages(['slot' => 'This time is already taken.']);
             }
 
-            return Appointment::create([
+            $appointment = Appointment::create([
                 'patient_id' => $patientId,
                 'doctor_id' => $doctorId,
                 'schedule_id' => $scheduleId,
@@ -89,6 +91,14 @@ class AppointmentService
                 'created_by' => $createdBy,
                 'status' => 'booked',
             ]);
+
+            // Notify the doctor (if doctor has a linked user account)
+            $doctorUser = optional($schedule->doctor)->user;
+            if ($doctorUser) {
+                Notification::send($doctorUser, new AppointmentBookedNotification($appointment));
+            }
+
+            return $appointment;
         });
     }
 }

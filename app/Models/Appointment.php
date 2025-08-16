@@ -50,4 +50,9 @@ class Appointment extends Model
     {
         return $this->belongsTo(DoctorSchedule::class, 'schedule_id');
     }
+
+    public function prescriptions()
+    {
+        return $this->hasMany(Prescription::class);
+    }
 }

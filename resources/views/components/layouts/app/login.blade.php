@@ -70,9 +70,27 @@
                         <p class="text-blue-100 mt-2">Sign in to your GovCare account</p>
                     </div>
                     
+                    <!-- Session Status -->
+                    @if (session('status'))
+                        <div class="px-6 pt-6">
+                            <div class="bg-green-50 border-l-4 border-green-600 text-green-800 p-4 rounded">
+                                {{ session('status') }}
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Validation Errors -->
+                    @if ($errors->any())
+                        <div class="px-6 pt-4">
+                            <div class="bg-red-50 border-l-4 border-red-600 text-red-800 p-4 rounded">
+                                {{ $errors->first() }}
+                            </div>
+                        </div>
+                    @endif
+
                     <!-- Login Form -->
                     <div class="px-6 py-8">
-                        <form class="space-y-6" method="POST" action="{{ route('login') }}">
+                        <form class="space-y-6" method="POST" action="{{ url('login') }}">
                             @csrf
                             <!-- NIC Field -->
                             <div>
@@ -89,12 +107,12 @@
                                         type="text" 
                                         id="nic" 
                                         name="nic" 
-                                        placeholder="Enter your NIC number"
+                                        placeholder="Enter your NIC or Email"
                                         class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
-                                        required
+                                        value="{{ old('nic') }}" required
                                     >
                                 </div>
-                                <p class="mt-1 text-xs text-gray-500">Format: 123456789V or 123456789012</p>
+                                <p class="mt-1 text-xs text-gray-500">NIC formats: 123456789V or 123456789012, or use your email</p>
                             </div>
                             
                             <!-- Password Field -->
@@ -169,7 +187,7 @@
                         
                         <!-- Register Link -->
                         <div class="mt-6 text-center">
-                            <a href="{{ route('register') }}" class="font-medium text-teal-600 hover:text-teal-500 transition-colors">
+                            <a href="{{ route('patient.register') }}" class="font-medium text-teal-600 hover:text-teal-500 transition-colors">
                                 Create a new account
                             </a>
                         </div>

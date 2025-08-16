@@ -66,7 +66,7 @@
                     <a href="{{ route('dashboard') }}" class="text-gray-500 hover:text-gray-700 py-2 px-1 border-b-2 border-transparent hover:border-gray-300 transition-colors">
                         Overview
                     </a>
-                    <a href="{{ route('register') }}" class="text-teal-600 py-2 px-1 border-b-2 border-teal-600 font-medium bg-gray-100 rounded-t-lg px-4">
+                    <a href="{{ route('patient.register') }}" class="text-teal-600 py-2 px-1 border-b-2 border-teal-600 font-medium bg-gray-100 rounded-t-lg px-4">
                         Register
                     </a>
                     <a href="#" class="text-gray-500 hover:text-gray-700 py-2 px-1 border-b-2 border-transparent hover:border-gray-300 transition-colors">
@@ -78,6 +78,18 @@
 
         <!-- Main Content -->
         <main class="container mx-auto px-6 py-8">
+            @if (session('status'))
+                <div class="mb-4 rounded-md bg-green-50 border border-green-200 text-green-700 p-3">{{ session('status') }}</div>
+            @endif
+            @if ($errors->any())
+                <div class="mb-4 rounded-md bg-red-50 border border-red-200 text-red-700 p-3">
+                    <ul class="list-disc ml-5">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
             <!-- Page Header -->
             <div class="bg-gradient-to-r from-blue-500 to-teal-500 rounded-lg p-6 mb-8 text-white">
                 <div class="flex items-center space-x-3">
@@ -94,7 +106,7 @@
             </div>
 
             <!-- Registration Form -->
-            <form class="max-w-4xl mx-auto" action="{{ route('register.post') }}" method="POST" enctype="multipart/form-data">
+            <form class="max-w-4xl mx-auto" action="{{ route('patient.register.post') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <!-- Personal Information Section -->
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
@@ -186,7 +198,7 @@
                         </div>
                         
                         <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email (optional)</label>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
                             <input type="email" id="email" name="email" 
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent">
                         </div>

@@ -17,27 +17,42 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-        $nic = $request->input('nic');
-        //check whether the input is a mail
-        if (filter_var($nic, FILTER_VALIDATE_EMAIL)) {
-            $user = User::where('email', $nic)->first();
+        $request->validate([
+            'nic' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        $identifier = $request->input('nic');
+
+        // Allow login via email or NIC
+        if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+            $user = User::where('email', $identifier)->first();
         } else {
-            $patient = Patient::where('nic', $nic)->first();
-            $user = User::where('id', $patient->user_id)->first();
+            $patient = Patient::where('nic', $identifier)->first();
+            $user = $patient ? User::find($patient->user_id) : null;
         }
 
         $password = $request->input('password');
 
-
         if ($user && Hash::check($password, $user->password)) {
-            auth()->login($user);
-            if($user->type == 'admin'){
-                return redirect()->route('admin.dashboard')->with('success','');
+            auth()->login($user, $request->boolean('remember'));
+
+            switch ($user->type) {
+                case 'admin':
+                    return redirect()->route('admin.dashboard');
+                case 'doctor':
+                    return redirect()->route('doctor.dashboard');
+                case 'staff':
+                    // Adjust if you add a staff dashboard later
+                    return redirect()->route('dashboard');
+                default:
+                    // Patients and any other types
+                    return redirect()->route('dashboard');
             }
         }
 
         return back()->withErrors([
             'nic' => 'The provided credentials do not match our records.',
-        ]);
+        ])->withInput($request->only('nic', 'remember'));
     }
 }

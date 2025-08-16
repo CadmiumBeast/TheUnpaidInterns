@@ -57,7 +57,7 @@ class RegistrationController extends Controller
             ]);
         });
 
-        Session::flash('success', 'Patient registered successfully!');
-        return redirect()->route('login');
+    Session::flash('status', 'Patient registered successfully! Please log in.');
+    return redirect()->route('login');
     }
 }

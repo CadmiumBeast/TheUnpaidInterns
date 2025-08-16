@@ -66,7 +66,7 @@
                     <a href="{{ route('dashboard') }}" class="text-gray-500 hover:text-gray-700 py-2 px-1 border-b-2 border-transparent hover:border-gray-300 transition-colors">
                         Overview
                     </a>
-                    <a href="{{ route('register') }}" class="text-gray-500 hover:text-gray-700 py-2 px-1 border-b-2 border-transparent hover:border-gray-300 transition-colors">
+                    <a href="{{ route('patient.register') }}" class="text-gray-500 hover:text-gray-700 py-2 px-1 border-b-2 border-transparent hover:border-gray-300 transition-colors">
                         Register
                     </a>
                     <a href="{{ route('medicine') }}" class="text-teal-600 py-2 px-1 border-b-2 border-teal-600 font-medium">

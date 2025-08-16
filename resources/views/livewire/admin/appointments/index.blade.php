@@ -91,6 +91,19 @@ new #[Layout('components.layouts.app')] class extends Component {
 <div class="space-y-6">
     <h1 class="text-2xl font-semibold mb-4">Doctor Appointment Slots</h1>
 
+    @if (session('status'))
+        <div class="rounded-md bg-green-50 text-green-700 border border-green-200 p-3">{{ session('status') }}</div>
+    @endif
+    @if ($errors->any())
+        <div class="rounded-md bg-red-50 text-red-700 border border-red-200 p-3">
+            <ul class="list-disc ml-5">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <div class="flex flex-wrap gap-4 mb-6 items-end">
         <div class="flex-1 min-w-[260px]">
             <label class="text-sm block mb-1">Patient</label>
@@ -176,6 +189,9 @@ new #[Layout('components.layouts.app')] class extends Component {
                 </div>
             </div>
             <div class="mt-4">
+                <div class="mb-2 text-right">
+                    <flux:link :href="route('admin.schedules.show', ['schedule' => $c['schedule']->id, 'date' => $c['date']])" wire:navigate class="text-sm text-teal-600">View booked patients</flux:link>
+                </div>
                 <form method="POST" action="{{ route('admin.appointments.reserve') }}" class="w-full">
                     @csrf
                     <input type="hidden" name="doctor_id" value="{{ $c['doctor']->id }}" />
