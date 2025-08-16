@@ -26,12 +26,10 @@ class DatabaseSeeder extends Seeder
             'type' => 'admin',
         ]);
 
-<<<<<<< HEAD
         // Seed complaints after users are created
         $this->call([
             ComplaintSeeder::class,
         ]);
-=======
 
         $pharmacies = [
             ["name" => "Rajagiriya Osusala", "location" => "Rajagiriya", "phone_number" => "011-2865923"],
@@ -156,6 +154,5 @@ class DatabaseSeeder extends Seeder
             }
         }
         
->>>>>>> 621b53d6aa9e6236f83b9054b591e051bb64dfa4
     }
 }
