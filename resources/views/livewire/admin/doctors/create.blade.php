@@ -35,12 +35,30 @@ new #[Layout('components.layouts.app')] class extends Component {
     public function mount(): void
     {
         $this->is_active = true;
-    $this->hospitals = config('hospitals.list', []);
+        $this->hospitals = config('hospitals.list', []);
+    }
+
+    public function addInitialSlot(): void
+    {
+        $this->initialSchedules[] = [
+            'hospital_name' => '',
+            'weekday' => '',
+            'start_time' => '',
+            'end_time' => '',
+            'capacity' => 25,
+        ];
+    }
+
+    public function removeInitialSlot(int $index): void
+    {
+        if (isset($this->initialSchedules[$index])) {
+            unset($this->initialSchedules[$index]);
+            $this->initialSchedules = array_values($this->initialSchedules);
+        }
     }
 
     public function save(): void
     {
-        dd($this->full_name, $this->specialty, $this->license_number, $this->contact_number, $this->email, $this->schedule_notes, $this->is_active, $this->profile_photo);
         $validated = $this->validate([
             'full_name' => ['required', 'string', 'max:255'],
             'specialty' => ['required', 'string', 'max:255'],
@@ -71,7 +89,7 @@ new #[Layout('components.layouts.app')] class extends Component {
             $photoPath = $this->profile_photo->store('profile-photos', 'public');
         }
 
-        $doctor = Doctor::create([
+    $doctor = Doctor::create([
             'user_id' => $userId,
             'full_name' => $this->full_name,
             'specialty' => $this->specialty,
@@ -106,16 +124,34 @@ new #[Layout('components.layouts.app')] class extends Component {
 
 <div class="space-y-6 max-w-2xl">
     <h1 class="text-xl font-semibold">Add Doctor</h1>
-
+        <form wire:submit.prevent="save" class="space-y-4">
+            @if ($errors->any())
+                <div class="p-2 rounded text-sm bg-red-50 text-red-700 border border-red-200">
+                    <ul class="list-disc list-inside">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
     <form wire:submit="save" class="space-y-4">
+            @error('full_name') <div class="text-xs text-red-600">{{ $message }}</div> @enderror
         <flux:input wire:model="full_name" label="Full name" required />
+            @error('specialty') <div class="text-xs text-red-600">{{ $message }}</div> @enderror
         <flux:input wire:model="specialty" label="Specialty" required />
+            @error('license_number') <div class="text-xs text-red-600">{{ $message }}</div> @enderror
         <flux:input wire:model="license_number" label="License number" required />
         <flux:input wire:model="contact_number" label="Contact number" />
         <flux:input wire:model="email" label="Email" type="email" />
         <flux:textarea wire:model="schedule_notes" label="Schedule notes" />
         <div>
             <label class="text-sm font-medium">Profile photo</label>
+                @if ($profile_photo)
+                    <div class="mt-2">
+                        <img src="{{ $profile_photo->temporaryUrl() }}" alt="Preview" class="h-16 w-16 rounded object-cover" />
+                    </div>
+                @endif
+                @error('profile_photo') <div class="text-xs text-red-600">{{ $message }}</div> @enderror
             <input type="file" wire:model="profile_photo" class="block mt-1" />
         </div>
         <div class="flex items-center gap-2">
@@ -165,13 +201,13 @@ new #[Layout('components.layouts.app')] class extends Component {
                     <flux:input type="time" wire:model="initialSchedules.{{ $idx }}.start_time" label="Start" />
                     <flux:input type="time" wire:model="initialSchedules.{{ $idx }}.end_time" label="End" />
             <flux:input type="number" min="1" max="200" wire:model="initialSchedules.{{ $idx }}.capacity" label="Capacity" />
-            <div class="md:col-span-5">
-                        <flux:button type="button" wire:click="$set('initialSchedules', array_values(array_filter(initialSchedules, fn($v,$k)=>$k!={{ $idx }}, ARRAY_FILTER_USE_BOTH)))">Remove</flux:button>
+                    <div class="md:col-span-5">
+                        <flux:button type="button" wire:click="removeInitialSlot({{ $idx }})">Remove</flux:button>
                     </div>
                 </div>
                 @endforeach
             </div>
-        <flux:button type="button" wire:click="$push('initialSchedules', ['hospital_name'=>'','weekday'=>'','start_time'=>'','end_time'=>'','capacity'=>25])">+ Add Slot</flux:button>
+        <flux:button type="button" wire:click="addInitialSlot">+ Add Slot</flux:button>
         </div>
 
         <flux:button type="submit" variant="primary">Save</flux:button>
