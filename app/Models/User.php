@@ -62,12 +62,12 @@ class User extends Authenticatable
     }
 
 
-    protected function type(): Attribute
-    {
-        return new Attribute(
-            get: fn ($value) =>  ["patient", "admin", "doctor", "staff"][$value],
-        );
-    }
+    // protected function type(): Attribute
+    // {
+    //     return new Attribute(
+    //         get: fn ($value) =>  ["patient", "admin", "doctor", "staff"][$value],
+    //     );
+    // }
 
     public function patients()
     {

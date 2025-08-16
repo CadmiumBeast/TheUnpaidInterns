@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MedicineController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 use App\Http\Controllers\Admin\AppointmentReservationController;
@@ -21,9 +22,7 @@ Route::middleware(['auth'])->group(function () {
 }
 );
 
-Route::get('medicine', function () {
-    return view('components.layouts.app.Medicine');
-})->name('medicine');
+
 
 // Public appointment browsing (no patient auth needed)
     Volt::route('appointments', 'appointments.browse')->name('appointments.browse');
@@ -56,7 +55,7 @@ Route::middleware(['auth', 'user-access:doctor'])->group(function () {
 
 // Patient Routes
 Route::middleware(['auth', 'user-access:patient'])->group(function () {
-    //
+    Route::get('medicine', [MedicineController::class, 'index'])->name('medicine');
 });
 
 require __DIR__.'/auth.php';
