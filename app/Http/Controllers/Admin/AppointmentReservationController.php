@@ -16,12 +16,12 @@ class AppointmentReservationController extends Controller
             'schedule_id' => ['required','integer','exists:doctor_schedules,id'],
             'date' => ['required','date'],
             'start_time' => ['required'],
-            'patient_id' => ['nullable','integer','exists:users,id'],
+            'patient_id' => ['required','integer','exists:users,id'],
         ]);
 
         $service->book(
             doctorId: (int)$data['doctor_id'],
-            patientId: $data['patient_id'] ?? null,
+            patientId: (int)$data['patient_id'],
             date: $data['date'],
             startTime: $data['start_time'],
             scheduleId: (int)$data['schedule_id'],

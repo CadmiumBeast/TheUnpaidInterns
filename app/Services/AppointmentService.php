@@ -33,6 +33,32 @@ class AppointmentService
                 throw ValidationException::withMessages(['slot' => 'Schedule mismatch.']);
             }
 
+            // Absence conflict: block if an exception entry covers this date/weekday
+            $day = \Illuminate\Support\Carbon::parse($date);
+            $absence = DoctorSchedule::where('doctor_id', $doctorId)
+                ->where('is_exception', true)
+                ->where(function($q) use ($day) {
+                    $q->whereDate('date', $day->toDateString())
+                      ->orWhere('weekday', $day->dayOfWeek);
+                })
+                ->exists();
+            if ($absence) {
+                throw ValidationException::withMessages(['slot' => 'Doctor is on leave for this time.']);
+            }
+
+            // Cross-hospital duplicate time: ensure no other schedule at same time for this doctor
+            $dupTime = DoctorSchedule::where('doctor_id', $doctorId)
+                ->where('id', '!=', $scheduleId)
+                ->where('start_time', $startTime)
+                ->where(function($q) use ($day) {
+                    $q->whereDate('date', $day->toDateString())
+                      ->orWhere('weekday', $day->dayOfWeek);
+                })
+                ->exists();
+            if ($dupTime) {
+                throw ValidationException::withMessages(['slot' => 'Doctor already has a slot at this time.']);
+            }
+
             // Capacity check
             $bookedCount = Appointment::where('doctor_id', $doctorId)
                 ->whereDate('scheduled_date', $date)
