@@ -40,6 +40,7 @@ new #[Layout('components.layouts.app')] class extends Component {
 
     public function save(): void
     {
+        dd($this->full_name, $this->specialty, $this->license_number, $this->contact_number, $this->email, $this->schedule_notes, $this->is_active, $this->profile_photo);
         $validated = $this->validate([
             'full_name' => ['required', 'string', 'max:255'],
             'specialty' => ['required', 'string', 'max:255'],
