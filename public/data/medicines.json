@@ -1,0 +1,59 @@
+{
+  "medicines": [
+    {
+      "id": "A2309",
+      "name": "Aspirin",
+      "category": "Cardiovascular",
+      "pharmacy": "City Pharmacy",
+      "phone": "0771234567",
+      "status": "Available",
+      "highlighted": true
+    },
+    {
+      "id": "87641",
+      "name": "Amoxicillin",
+      "category": "Antibiotic",
+      "pharmacy": "Sun Pharmacy",
+      "phone": "07753627812",
+      "status": "Available",
+      "highlighted": false
+    },
+    {
+      "id": "G5431",
+      "name": "Cetrizet",
+      "category": "Wheeding",
+      "pharmacy": "Dehiwala Pharmacy",
+      "phone": "07738373683",
+      "status": "Available",
+      "highlighted": false
+    },
+    {
+      "id": "L877",
+      "name": "Lispinol",
+      "category": "Cardiovascular",
+      "pharmacy": "Colombo 07",
+      "phone": "077326563673",
+      "status": "Available",
+      "highlighted": false
+    },
+    {
+      "id": "F522",
+      "name": "Panadol",
+      "category": "Antibiotic",
+      "pharmacy": "Osucola Pharmacy",
+      "phone": "0773853267371",
+      "status": "Available",
+      "highlighted": false
+    },
+    {
+      "id": "23623",
+      "name": "Metformin",
+      "category": "Diabetes",
+      "pharmacy": "City Pharmacy",
+      "phone": "0771234567",
+      "status": "Available",
+      "highlighted": false
+    }
+  ]
+}
+

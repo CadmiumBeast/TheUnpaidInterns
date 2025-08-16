@@ -67,4 +67,14 @@ class User extends Authenticatable
             get: fn ($value) =>  ["patient", "admin", "doctor", "staff"][$value],
         );
     }
+
+    public function complaints()
+    {
+        return $this->hasMany(Complaint::class);
+    }
+
+    public function assignedComplaints()
+    {
+        return $this->hasMany(Complaint::class, 'assigned_to');
+    }
 }

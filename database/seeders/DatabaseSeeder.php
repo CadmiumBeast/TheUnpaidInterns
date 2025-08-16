@@ -19,5 +19,10 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        // Seed complaints after users are created
+        $this->call([
+            ComplaintSeeder::class,
+        ]);
     }
 }
