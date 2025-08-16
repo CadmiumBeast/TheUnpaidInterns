@@ -102,8 +102,32 @@ new #[Layout('components.layouts.app')] class extends Component {
         ]);
 
         // Create initial schedules if provided
-    foreach ($this->initialSchedules as $slot) {
+        foreach ($this->initialSchedules as $slot) {
             if (!empty($slot['hospital_name']) && !empty($slot['start_time']) && !empty($slot['end_time'])) {
+                // Prevent duplicate time for same doctor across different hospitals in same day-of-week/date
+                $conflict = \App\Models\DoctorSchedule::where('doctor_id', $doctor->id)
+                    ->where('start_time', $slot['start_time'])
+                    ->when(($slot['weekday'] ?? '') !== '', fn($q) => $q->where('weekday', (int)$slot['weekday']))
+                    ->when(($slot['weekday'] ?? '') === '' && !empty($slot['date'] ?? null), fn($q) => $q->whereDate('date', $slot['date']))
+                    ->where('is_exception', false)
+                    ->exists();
+                if ($conflict) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'initialSchedules' => ['Conflicting slot: a slot at this time already exists for this doctor.'],
+                    ]);
+                }
+
+                // Prevent scheduling during absences/exceptions
+                $absenceConflict = \App\Models\DoctorSchedule::where('doctor_id', $doctor->id)
+                    ->where('is_exception', true)
+                    ->when(($slot['weekday'] ?? '') !== '', fn($q) => $q->where('weekday', (int)$slot['weekday']))
+                    ->when(($slot['weekday'] ?? '') === '' && !empty($slot['date'] ?? null), fn($q) => $q->whereDate('date', $slot['date']))
+                    ->exists();
+                if ($absenceConflict) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'initialSchedules' => ['This time falls within an absence/leave period.'],
+                    ]);
+                }
                 DoctorSchedule::create([
                     'doctor_id' => $doctor->id,
                     'hospital_name' => $slot['hospital_name'],
@@ -138,7 +162,15 @@ new #[Layout('components.layouts.app')] class extends Component {
             @error('full_name') <div class="text-xs text-red-600">{{ $message }}</div> @enderror
         <flux:input wire:model="full_name" label="Full name" required />
             @error('specialty') <div class="text-xs text-red-600">{{ $message }}</div> @enderror
-        <flux:input wire:model="specialty" label="Specialty" required />
+        <div>
+            <label class="text-sm block mb-1">Specialty</label>
+            <select class="w-full border rounded-md p-2 bg-white dark:bg-zinc-900" wire:model="specialty" required>
+                <option value="">Select specialty...</option>
+                @foreach(config('specialties.list', []) as $spec)
+                    <option value="{{ $spec }}">{{ $spec }}</option>
+                @endforeach
+            </select>
+        </div>
             @error('license_number') <div class="text-xs text-red-600">{{ $message }}</div> @enderror
         <flux:input wire:model="license_number" label="License number" required />
         <flux:input wire:model="contact_number" label="Contact number" />
